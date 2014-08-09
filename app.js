@@ -201,7 +201,7 @@ angular.module('SearchApp', [])
 
         $scope.conductSearch = function () {
             var term = getFormattedInput();
-            cancelJobIfStillActive(delayedJob);
+            cancelJobIfStillActive();
             resetErrorState();
             resetPaging();
             $scope.searchResults = [];
@@ -211,15 +211,12 @@ angular.module('SearchApp', [])
                 $scope.fetchingMoreResults = false;
                 delayedJob.promise
                     .then(onSearchResultsReceived)
-                    .catch(onErrorOccured)
+                    .catch(onErrorOccurred)
                     .finally(resetRequestInitiation);
             }
         };
 
-        /**
-         * @param {StructuredDelayedTask} delayedJob
-         */
-        var cancelJobIfStillActive = function (delayedJob) {
+        var cancelJobIfStillActive = function () {
             if (delayedJob) {
                 delayedJob.handle.cancel();
                 delayedJob = null;
@@ -228,7 +225,7 @@ angular.module('SearchApp', [])
 
         $scope.fetchMoreResults = function () {
             var term = getFormattedInput();
-            cancelJobIfStillActive(delayedJob);
+            cancelJobIfStillActive();
             resetErrorState();
             incrementPage();
             delayedJob = githubService.searchByKeywordWithPaging(term, currentPage);
@@ -238,7 +235,7 @@ angular.module('SearchApp', [])
                 .then(onSearchResultsReceived)
                 .catch(function (error) {
                     decrementPage();
-                    onErrorOccured(error, true);
+                    onErrorOccurred(error);
                 })
                 .finally(resetRequestInitiation);
         };
@@ -258,10 +255,7 @@ angular.module('SearchApp', [])
          * @param {Object} error
          * @param {boolean} keepTerm
          */
-        var onErrorOccured = function (error, keepTerm) {
-            if (!keepTerm) {
-                $scope.searchTerm = "";
-            }
+        var onErrorOccurred = function (error) {
             $scope.error = error;
         };
 
@@ -305,7 +299,8 @@ angular.module('SearchApp', [])
             return $scope.canLoadMore === true &&
                 getFormattedInput() != "" &&
                 currentPage <= PAGE_LIMIT &&
-                $scope.canInitiateRequests === true;
+                $scope.canInitiateRequests === true &&
+                $scope.searchResults.length > 0;
         };
 
     }])

@@ -17,7 +17,7 @@
 </div>
 <label style="margin-right: 10px">Search In Repositories: </label>
 <input id="search" data-ng-model="searchTerm" data-ng-change="conductSearch()" type="text"
-       data-ng-disabled="fetchingMoreResults === true"/>
+       data-ng-disabled="fetchingMoreResults"/>
 
 <div class="container-fluid">
     <div class="row spaces" data-ng-repeat="repositoryInfo in searchResults">
