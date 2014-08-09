@@ -1,14 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <title>Search</title>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  <script src="app.js"></script>
-  <style src="app.css"></style>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Search</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="app.js"></script>
+    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="app.css">
 </head>
-<body>
-  <input id="search" type="text"/>
-  <div id="results"></div>
+<body data-ng-app="SearchApp" data-ng-controller="SearchController"
+      data-ng-init="isFetchingInProgress=false;isLoadingMore=false;">
+<div class="alert alert-danger" data-ng-if="error">
+    {{ error.message }}
+</div>
+<label style="margin-right: 10px">Search In Repositories: </label>
+<input id="search" data-ng-model="searchTerm" data-ng-change="conductSearch()" type="text"
+       data-ng-disabled="fetchingMoreResults === true"/>
+
+<div class="container-fluid">
+    <div class="row spaces" data-ng-repeat="repositoryInfo in searchResults">
+        <div class="col-lg-4 col-md-6 col-xs-12 ">
+            <div class="btn btn-info btn-lg btn-block"
+                 data-ng-init="hasClicked=false;"
+                 data-ng-click="hasClicked = !hasClicked">
+                {{ repositoryInfo.owner }}/{{ repositoryInfo.name }}
+            </div>
+
+            <div data-ng-show="hasClicked" class="table-responsive">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td><h5>Language</h5></td>
+                        <td>{{ repositoryInfo.language }}</td>
+                    </tr>
+                    <tr>
+                        <td><h5>Followers Count</h5></td>
+                        <td>{{ repositoryInfo.followers }}</td>
+                    </tr>
+                    <tr>
+                        <td><h5>URL</h5></td>
+                        <td>{{ repositoryInfo.url }}</td>
+                    </tr>
+                    <tr>
+                        <td><h5>Description</h5></td>
+                        <td>{{ repositoryInfo.description }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row spaces" data-ng-show="isAllowedToLoadMore()">
+        <div class="col-lg-4 col-md-6 col-xs-12 ">
+            <input type="button"
+                   class="btn btn-primary"
+                   value="loadMore"
+                   data-ng-click="fetchMoreResults()"/>
+        </div>
+    </div>
+</div>
+<div class="alert alert-danger spaces" data-ng-if="error">
+    {{ error.message }}
+</div>
+
 </body>
 </html>
